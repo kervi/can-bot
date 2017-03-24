@@ -1,7 +1,7 @@
 """ Sample controller """
 from kervi.controller import Controller, UINumberControllerInput, UISwitchButtonControllerInput
 from kervi.hal import GPIO
-from kervi_devices.motors.adafruit_i2c_motor_hat import AdafruitMotorHat
+from kervi_devices.motors.adafruit_i2c_motor_hat import AdafruitMotorHAT
 class SteeringController(Controller):
     def __init__(self):
         Controller.__init__(self, "controller.steering", "Manual steering")

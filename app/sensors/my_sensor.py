@@ -1,5 +1,5 @@
 """ Module for a sensor """
-from kervi.sensor import Sensor, SensorThread
+from kervi.sensor import Sensor
 
 class MySensor(Sensor):
     """ My sensor """
