@@ -26,7 +26,7 @@ class SteeringController(Controller):
         self.direction_input.link_to_dashboard("app", "steering")
 
         self.motor_board = AdafruitMotorHAT()
-        self.steering = MotorSteering(self.motor_board.dc_motors[1], self.motor_board.dc_motors[2])
+        self.steering = MotorSteering(self.motor_board.dc_motors[0], self.motor_board.dc_motors[2])
 
     def input_changed(self, changed_input):
         print("steering input changed:", changed_input.input_id, changed_input.value)
