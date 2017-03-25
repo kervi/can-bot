@@ -26,14 +26,14 @@ class SteeringController(Controller):
         self.direction_input.link_to_dashboard("app", "steering")
 
         self.motor_board = AdafruitMotorHAT()
-        self.steering = MotorSteering(self.motor_board.dc_motors[1],self.motor_board.dc_motors[2])
+        self.steering = MotorSteering(self.motor_board.dc_motors[1], self.motor_board.dc_motors[2])
 
     def input_changed(self, changed_input):
         print("steering input changed:", changed_input.input_id, changed_input.value)
         if changed_input == self.all_off_button:
             self.motor_board.dc_motors.stop_all()
 
-        if changed_input.input_id == self.speed_input or changed_input.input_id == self.direction_input:
+        if changed_input == self.speed_input or changed_input == self.direction_input:
             self.steering.run(self.speed_input.value, self.direction_input.value)
 
 SteeringController()
