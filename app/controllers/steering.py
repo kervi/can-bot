@@ -29,6 +29,7 @@ class SteeringController(Controller):
         self.steering = MotorSteering(self.motor_board.dc_motors[1],self.motor_board.dc_motors[2])
 
     def input_changed(self, changed_input):
+        print("steering input changed:", changed_input.input_id, changed_input.value)
         if changed_input == self.all_off_button:
             self.motor_board.dc_motors.stop_all()
 
