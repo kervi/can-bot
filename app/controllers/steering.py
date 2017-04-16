@@ -15,10 +15,10 @@ steering.all_off.link_to_dashboard("app", "steering")
 
 
 motor_board = AdafruitMotorHAT()
-motor_board.dc_motors[1].speed.link_to(steering.left_speed)
-motor_board.dc_motors[2].speed.link_to(steering.right_speed)
+motor_board.dc_motors[2].speed.link_to(steering.left_speed)
+motor_board.dc_motors[3].speed.link_to(steering.right_speed)
 
 
 orientation_sensor = Sensor("orientation", "orientation", LSM9DS0OrientationDeviceDriver())
 orientation_sensor.store_to_db = False
-orientation_sensor.link_to_dashboard("app", "sensors", type="value", size=2, link_to_header=True)
+orientation_sensor.link_to_dashboard("app", "sensors", type="value", size=2)
