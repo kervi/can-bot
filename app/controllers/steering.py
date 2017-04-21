@@ -13,6 +13,8 @@ steering.speed.link_to_dashboard("app", "steering")
 steering.direction.link_to_dashboard("app", "steering")
 steering.all_off.link_to_dashboard("app", "steering")
 
+steering.speed.link_to_dashboard("app", "left_pad_y")
+steering.direction.link_to_dashboard("app", "left_pad_x")
 
 motor_board = AdafruitMotorHAT()
 motor_board.dc_motors[2].speed.link_to(steering.left_speed)
