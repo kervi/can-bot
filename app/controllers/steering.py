@@ -63,8 +63,6 @@ class PIDController(Controller):
                     self.last_error = error
 
                     self.result.value = self.p_term + (self.ki.value * self.i_term) + (self.kd.value * self.d_term)
-                
-
 
 
 steering = MotorSteering()
@@ -72,7 +70,7 @@ steering.speed.link_to_dashboard("app", "steering")
 steering.direction.link_to_dashboard("app", "steering")
 steering.all_off.link_to_dashboard("app", "steering")
 
-steering.speed.link_to_dashboard("app", "left_pad_y")
+steering.speed.link_to_dashboard("app", "left_pad_y", pad_auto_center=True)
 steering.direction.link_to_dashboard("app", "left_pad_x")
 
 pid_controller = PIDController("balance_pid", "Balance pid")
@@ -83,7 +81,7 @@ pid_controller.windup_guard.link_to_dashboard("app", "balance_pid")
 pid_controller.base_value.link_to_dashboard("app", "balance_pid")
 pid_controller.active.link_to_dashboard("app", "balance_pid")
 
-steering.speed.link_to(pid_controller.result)
+steering.adaptive_speed.link_to(pid_controller.result)
 
 
 motor_board = AdafruitMotorHAT()
