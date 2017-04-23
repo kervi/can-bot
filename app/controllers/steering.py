@@ -22,7 +22,7 @@ class PIDController(Controller):
 
         self.value = self.inputs.add("value", "Value", DynamicNumber)
 
-        self .result = self.outputs.add("pid_result", "PID result", DynamicNumber)
+        self.result = self.outputs.add("pid_result", "PID result", DynamicNumber)
 
         self.sample_time = 0.00
         self.current_time = time.time()
@@ -83,7 +83,7 @@ pid_controller.windup_guard.link_to_dashboard("app", "balance_pid")
 pid_controller.base_value.link_to_dashboard("app", "balance_pid")
 pid_controller.active.link_to_dashboard("app", "balance_pid")
 
-steering.speed.link_to(pid_controller.value)
+steering.speed.link_to(pid_controller.result)
 
 motor_board = AdafruitMotorHAT()
 motor_board.dc_motors[2].speed.link_to(steering.left_speed)
