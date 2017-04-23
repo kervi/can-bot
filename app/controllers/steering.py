@@ -62,7 +62,7 @@ class PIDController(Controller):
                     self.last_time = self.current_time
                     self.last_error = error
 
-                    self.value.value = self.p_term + (self.ki.value * self.i_term) + (self.kd.value * self.d_term)
+                    self.result.value = self.p_term + (self.ki.value * self.i_term) + (self.kd.value * self.d_term)
                 
 
 
