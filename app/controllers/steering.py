@@ -96,7 +96,12 @@ motor_board.dc_motors[2].speed.link_to(steering.left_speed)
 motor_board.dc_motors[3].speed.link_to(steering.right_speed)
 
 
-orientation_sensor = Sensor("orientation", "orientation", LSM9DS0OrientationDeviceDriver())
+orientation_sensor = Sensor(
+    "orientation",
+    "Orientation",
+    LSM9DS0OrientationDeviceDriver(),
+    reading_interval=.1
+)
 orientation_sensor.store_to_db = False
 orientation_sensor.link_to_dashboard("app", "sensors", type="value", size=2)
 
