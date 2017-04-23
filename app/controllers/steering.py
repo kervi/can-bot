@@ -38,6 +38,13 @@ class PIDController(Controller):
         self.windup_guard.value = 20.0
 
     def dynamic_value_changed(self, changed_input):
+        if changed_input == self.active and not self.active.value:
+            self.p_term = 0.0
+            self.i_term = 0.0
+            self.d_term = 0.0
+            self.last_error = 0.0
+            self.int_error = 0.0
+
         if changed_input == self.value:
             if self.active.value:
                 error = self.value.value - self.base_value.value
