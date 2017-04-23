@@ -95,4 +95,4 @@ orientation_sensor = Sensor("orientation", "orientation", LSM9DS0OrientationDevi
 orientation_sensor.store_to_db = False
 orientation_sensor.link_to_dashboard("app", "sensors", type="value", size=2)
 
-pid_controller.value.link_to(orientation_sensor["roll"])
+pid_controller.value.link_to(orientation_sensor[2])
