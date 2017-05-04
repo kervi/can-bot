@@ -111,7 +111,7 @@ orientation_sensor = Sensor(
     "orientation",
     "Orientation",
     LSM9DS0OrientationDeviceDriver(),
-    reading_interval=.1
+    polling_interval=.1
 )
 orientation_sensor.store_to_db = False
 orientation_sensor.link_to_dashboard("app", "sensors", type="value", size=2)
