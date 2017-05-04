@@ -14,6 +14,7 @@ import time
 class PIDController(Controller):
     def __init__(self, controller_id, name):
         Controller.__init__(self, controller_id, name)
+        self._ready = False
         self.kp = self.inputs.add("kp", "Kp", DynamicNumber)
         self.kp.persist_value = True
         self.kd = self.inputs.add("kd", "Kd", DynamicNumber)
@@ -43,7 +44,11 @@ class PIDController(Controller):
         self.int_error = 0.0
         self.windup_guard.value = 20.0
 
+        self._ready = True
+
     def input_changed(self, changed_input):
+        if not self._ready:
+            return
         if changed_input == self.active and not self.active.value:
             self.p_term = 0.0
             self.i_term = 0.0
