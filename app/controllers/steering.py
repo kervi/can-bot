@@ -10,18 +10,24 @@ from kervi_devices.sensors.LSM9DS0 import LSM9DS0OrientationDeviceDriver
 from kervi.controller import Controller
 from kervi.values import DynamicNumber, DynamicBoolean
 import time
+
 class PIDController(Controller):
     def __init__(self, controller_id, name):
         Controller.__init__(self, controller_id, name)
         self.kp = self.inputs.add("kp", "Kp", DynamicNumber)
+        self.kp.persist_value = True
         self.kd = self.inputs.add("kd", "Kd", DynamicNumber)
+        self.kd.persist_value = True
         self.ki = self.inputs.add("ki", "Ki", DynamicNumber)
+        self.ki.persist_value = True
+
         self.active = self.inputs.add("active", "Active", DynamicBoolean)
         self.windup_guard = self.inputs.add("windup_guard", "Windup guard", DynamicNumber)
+        self.windup_guard.persist_value = True
         self.base_value = self.inputs.add("base_value", "Base value", DynamicNumber)
+        self.base_value.persist_value = True
 
         self.value = self.inputs.add("value", "Value", DynamicNumber)
-
         self.result = self.outputs.add("pid_result", "PID result", DynamicNumber)
 
         self.sample_time = 0.00
@@ -37,7 +43,7 @@ class PIDController(Controller):
         self.int_error = 0.0
         self.windup_guard.value = 20.0
 
-    def dynamic_value_changed(self, changed_input):
+    def input_changed(self, changed_input):
         if changed_input == self.active and not self.active.value:
             self.p_term = 0.0
             self.i_term = 0.0
