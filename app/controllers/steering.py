@@ -1,40 +1,119 @@
 """ Sample controller """
-from kervi.controller import Controller, UINumberControllerInput, UIButtonControllerInput
-from kervi.hal import GPIO
+#from kervi.controller import Controller
+#from kervi.values import DynamicBoolean, DynamicNumber
+#from kervi.hal import GPIO
+from kervi.sensor import Sensor
 from kervi.steering import MotorSteering
 from kervi_devices.motors.adafruit_i2c_motor_hat import AdafruitMotorHAT
+from kervi_devices.sensors.LSM9DS0 import LSM9DS0OrientationDeviceDriver
 
-class SteeringController(Controller):
-    def __init__(self):
-        Controller.__init__(self, "controller.steering", "Manual steering")
-        self.type = "motor"
+from kervi.controller import Controller
+from kervi.values import DynamicNumber, DynamicBoolean
+import time
 
-        #define an input and link it to the dashboard panel
-        self.all_off_button = UIButtonControllerInput("controller.steering.allOff", "All off", self)
-        self.all_off_button.link_to_dashboard("app", "steering")
+class PIDController(Controller):
+    def __init__(self, controller_id, name):
+        Controller.__init__(self, controller_id, name)
+        self._ready = False
+        self.kp = self.inputs.add("kp", "Kp", DynamicNumber)
+        self.kp.persist_value = True
+        self.kd = self.inputs.add("kd", "Kd", DynamicNumber)
+        self.kd.persist_value = True
+        self.ki = self.inputs.add("ki", "Ki", DynamicNumber)
+        self.ki.persist_value = True
 
-        self.speed_input = UINumberControllerInput("controller.steering.speed", "Speed", self)
-        self.speed_input.min = -100
-        self.speed_input.max = 100
-        self.speed_input.value = 0
-        self.speed_input.link_to_dashboard("app", "steering")
+        self.active = self.inputs.add("active", "Active", DynamicBoolean)
+        self.windup_guard = self.inputs.add("windup_guard", "Windup guard", DynamicNumber)
+        self.windup_guard.persist_value = True
+        self.base_value = self.inputs.add("base_value", "Base value", DynamicNumber)
+        self.base_value.persist_value = True
 
-        self.direction_input = UINumberControllerInput("controller.steering.direction", "Direction", self)
-        self.direction_input.min = -100
-        self.direction_input.max = 100
-        self.direction_input.value = 0
-        self.direction_input.link_to_dashboard("app", "steering")
+        self.value = self.inputs.add("value", "Value", DynamicNumber)
+        self.result = self.outputs.add("pid_result", "PID result", DynamicNumber)
 
-        self.motor_board = AdafruitMotorHAT()
-        self.steering = MotorSteering(self.motor_board.dc_motors[3], self.motor_board.dc_motors[2])
+        self.sample_time = 0.00
+        self.current_time = time.time()
+        self.last_time = self.current_time
+
+        self.p_term = 0.0
+        self.i_term = 0.0
+        self.d_term = 0.0
+        self.last_error = 0.0
+
+        # Windup Guard
+        self.int_error = 0.0
+        self.windup_guard.value = 20.0
+
+        self._ready = True
 
     def input_changed(self, changed_input):
-        print("steering input changed:", changed_input.input_id, changed_input.value)
-        if changed_input == self.all_off_button:
-            self.motor_board.dc_motors.stop_all()
+        if not self._ready:
+            return
+        if changed_input == self.active and not self.active.value:
+            self.p_term = 0.0
+            self.i_term = 0.0
+            self.d_term = 0.0
+            self.last_error = 0.0
+            self.int_error = 0.0
 
-        if changed_input == self.speed_input or changed_input == self.direction_input:
-            self.steering.run(self.speed_input.value, self.direction_input.value)
+        if changed_input == self.value:
+            if self.active.value:
+                error = self.value.value - self.base_value.value
 
-SteeringController()
+                self.current_time = time.time()
+                delta_time = self.current_time - self.last_time
+                delta_error = error - self.last_error
 
+                if delta_time >= self.sample_time:
+                    self.p_term = self.kp.value * error
+                    self.i_term += error * delta_time
+
+                    if self.i_term < -self.windup_guard.value:
+                        self.i_term = -self.windup_guard.value
+                    elif self.i_term > self.windup_guard.value:
+                        self.i_term = self.windup_guard.value
+
+                    self.d_term = 0.0
+                    if delta_time > 0:
+                        self.d_term = delta_error / delta_time
+
+                    self.last_time = self.current_time
+                    self.last_error = error
+
+                    self.result.value = self.p_term + (self.ki.value * self.i_term) + (self.kd.value * self.d_term)
+
+
+steering = MotorSteering()
+steering.speed.link_to_dashboard("app", "steering")
+steering.direction.link_to_dashboard("app", "steering")
+steering.all_off.link_to_dashboard("app", "steering")
+
+steering.speed.link_to_dashboard("app", "left_pad_y", pad_auto_center=True)
+steering.direction.link_to_dashboard("app", "left_pad_x")
+
+pid_controller = PIDController("balance_pid", "Balance pid")
+pid_controller.kp.link_to_dashboard("app", "balance_pid")
+pid_controller.ki.link_to_dashboard("app", "balance_pid")
+pid_controller.kd.link_to_dashboard("app", "balance_pid")
+pid_controller.windup_guard.link_to_dashboard("app", "balance_pid")
+pid_controller.base_value.link_to_dashboard("app", "balance_pid")
+pid_controller.active.link_to_dashboard("app", "balance_pid")
+
+steering.adaptive_speed.link_to(pid_controller.result)
+
+
+motor_board = AdafruitMotorHAT()
+motor_board.dc_motors[2].speed.link_to(steering.left_speed)
+motor_board.dc_motors[3].speed.link_to(steering.right_speed)
+
+
+orientation_sensor = Sensor(
+    "orientation",
+    "Orientation",
+    LSM9DS0OrientationDeviceDriver(),
+    polling_interval=.1
+)
+orientation_sensor.store_to_db = False
+orientation_sensor.link_to_dashboard("app", "sensors", type="value", size=2)
+
+pid_controller.value.link_to(orientation_sensor[2])
