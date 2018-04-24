@@ -1,6 +1,6 @@
 import datetime
-from kervi.camera import CameraStreamer
-from kervi_devices.motors.PCA9685_i2c_servo import PCA9685ServoBoard
+from kervi.vision.camera import CameraStreamer
+from kervi.devices.motors.PCA9685_i2c_servo import PCA9685ServoBoard
 
 CAM1 = CameraStreamer("cam1", "camera 1")
 CAM1.flip_vertical = True

@@ -2,34 +2,34 @@
 #from kervi.controller import Controller
 #from kervi.values import DynamicBoolean, DynamicNumber
 #from kervi.hal import GPIO
-from kervi.sensor import Sensor
-from kervi.steering import MotorSteering
-from kervi_devices.motors.adafruit_i2c_motor_hat import AdafruitMotorHAT
-from kervi_devices.sensors.LSM9DS0 import LSM9DS0OrientationDeviceDriver
+from kervi.sensors.sensor import Sensor
+from kervi.controllers.steering import MotorSteering
+from kervi.devices.motors.adafruit_i2c_motor_hat import AdafruitMotorHAT
+from kervi.devices.sensors.LSM9DS0 import LSM9DS0OrientationDeviceDriver
 
-from kervi.controller import Controller
-from kervi.values import DynamicNumber, DynamicBoolean
+from kervi.controllers.controller import Controller
+from kervi.core.values import NumberValue, BooleanValue
 import time
 
 class PIDController(Controller):
     def __init__(self, controller_id, name):
         Controller.__init__(self, controller_id, name)
         self._ready = False
-        self.kp = self.inputs.add("kp", "Kp", DynamicNumber)
+        self.kp = self.inputs.add("kp", "Kp", NumberValue)
         self.kp.persist_value = True
-        self.kd = self.inputs.add("kd", "Kd", DynamicNumber)
+        self.kd = self.inputs.add("kd", "Kd", NumberValue)
         self.kd.persist_value = True
-        self.ki = self.inputs.add("ki", "Ki", DynamicNumber)
+        self.ki = self.inputs.add("ki", "Ki", NumberValue)
         self.ki.persist_value = True
 
-        self.active = self.inputs.add("active", "Active", DynamicBoolean)
-        self.windup_guard = self.inputs.add("windup_guard", "Windup guard", DynamicNumber)
+        self.active = self.inputs.add("active", "Active", BooleanValue)
+        self.windup_guard = self.inputs.add("windup_guard", "Windup guard", NumberValue)
         self.windup_guard.persist_value = True
-        self.base_value = self.inputs.add("base_value", "Base value", DynamicNumber)
+        self.base_value = self.inputs.add("base_value", "Base value", NumberValue)
         self.base_value.persist_value = True
 
-        self.value = self.inputs.add("value", "Value", DynamicNumber)
-        self.result = self.outputs.add("pid_result", "PID result", DynamicNumber)
+        self.value = self.inputs.add("value", "Value", NumberValue)
+        self.result = self.outputs.add("pid_result", "PID result", NumberValue)
 
         self.sample_time = 0.00
         self.current_time = time.time()
@@ -86,7 +86,7 @@ class PIDController(Controller):
 steering = MotorSteering()
 steering.speed.link_to_dashboard("app", "steering")
 steering.direction.link_to_dashboard("app", "steering")
-steering.all_off.link_to_dashboard("app", "steering")
+#steering.all_off.link_to_dashboard("app", "steering")
 
 steering.speed.link_to_dashboard("app", "left_pad_y", pad_auto_center=True)
 steering.direction.link_to_dashboard("app", "left_pad_x")
