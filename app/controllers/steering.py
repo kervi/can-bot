@@ -8,7 +8,7 @@ from kervi.devices.motors.adafruit_i2c_motor_hat import AdafruitMotorHAT
 from kervi.devices.sensors.LSM9DS0 import LSM9DS0OrientationDeviceDriver
 
 from kervi.controllers.controller import Controller
-from kervi.core.values import NumberValue, BooleanValue
+from kervi.values import NumberValue, BooleanValue
 import time
 
 class PIDController(Controller):
