@@ -16,17 +16,17 @@ class PIDController(Controller):
         Controller.__init__(self, controller_id, name)
         self._ready = False
         self.kp = self.inputs.add("kp", "Kp", NumberValue)
-        self.kp.persist_value = True
+        self.kp.persist = True
         self.kd = self.inputs.add("kd", "Kd", NumberValue)
-        self.kd.persist_value = True
+        self.kd.persist = True
         self.ki = self.inputs.add("ki", "Ki", NumberValue)
-        self.ki.persist_value = True
+        self.ki.persist = True
 
         self.active = self.inputs.add("active", "Active", BooleanValue)
         self.windup_guard = self.inputs.add("windup_guard", "Windup guard", NumberValue)
-        self.windup_guard.persist_value = True
+        self.windup_guard.persist = True
         self.base_value = self.inputs.add("base_value", "Base value", NumberValue)
-        self.base_value.persist_value = True
+        self.base_value.persist = True
 
         self.value = self.inputs.add("value", "Value", NumberValue)
         self.result = self.outputs.add("pid_result", "PID result", NumberValue)
